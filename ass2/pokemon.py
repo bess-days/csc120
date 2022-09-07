@@ -7,11 +7,11 @@ def establish(file):
             lines = row.split(",")
             rows.append(lines)
     return rows
-def entries(rows):
+def set_dict(rows):
     entries = {}
     data = {}
     averages = {}
-    for i in range(len(rows) - 1):
+    for i in range(len(rows)):
         entry = rows[i]
         names = entry[1]
         type = entry[2]
@@ -34,41 +34,38 @@ def entries(rows):
             data[type][names]["specialdefense"] = int(entry[9])
             data[type][names]["speed"] = int(entry[10])
     return data
-def input_process(file, par):
-    results = []
+def inputs(file, skill):
     averages = {}
-    finishing = {}
-    comparable = []
-    par = par.lower()
-    types_all = ["total", "speed", "attack", "specialattack", "defense", "specialdefense", "hp"]
-    for i in range(len(types_all)):
-        if par != types_all[i] and par not in types_all:
-            par = input()
-    for of_type in entries(establish(file)):
-        average = of_type
-        pokemon = entries(establish(file))[average]
-        if average not in averages:
-            averages[average] = []
-        for p in pokemon:
-            averages[average].append(pokemon[p][par])
-        all = sum(averages[average])
-        divisible = len(averages[average])
-        average = all / divisible
-        finishing[average] = average
-        comparable.append(average)
-    for finish in finishing:
-        max_average = max(comparable)
-        pokemon_type = finish
-        if finishing[finish] == max_average:
-            results.append(pokemon_type)
-    for result in sorted(results):
-        print("{}: {}".format(result, max(comparable)))
+    outputs = []
+    perskill = []
+    all_entries = set_dict(establish(file))
+    sums = 0
+    for entries in all_entries:
+        for pokemon in all_entries[entries]:
+            if entries not in averages:
+                averages[entries] = []
+            averages[entries].append(all_entries[entries][pokemon][skill])
+        for i in range(len(averages[entries])):
+            sums += averages[entries][i]
+        avg = sums/len(averages[entries])
+        averages[entries] = [avg]
+        perskill.append(avg)
+        sums = 0
+    highest = sorted(perskill)[len(perskill) -1]
+    for average in averages:
+        if averages[average] == [highest]:
+            outputs.append(average)
+    for i in sorted(outputs):
+        print("{}: {}".format(i, highest))
 def main():
     file = input()
-    entries(establish(file))
-    par = input()
-    while len(par) > 0:
-        input_process(file, par)
-        par = input()
+    set_dict(establish(file))
+    skill = input().lower()
+    skills_all = ["total", "speed", "attack", "specialattack", "defense", "specialdefense", "hp"]
+    while len(skill) > 0:
+        for i in range(len(skills_all)):
+            if skill != skills_all[i] and skill not in skills_all:
+                skill = input().lower()
+        inputs(file, skill)
+        skill = input().lower()
 main()
-
