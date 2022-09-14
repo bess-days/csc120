@@ -36,4 +36,4 @@ def print_some_words(file, n):
             print(results)
 
 
-print_some_words("files", 3)
+print_some_words("../files", 3)
